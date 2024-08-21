@@ -1,10 +1,13 @@
 import { User } from '../Models/user.js';
 import { encryptWithBcrypt, verifyWithBcrypt } from '../utils/encryption-util.js';
+import { generateJWTToken } from '../utils/jwt-util.js';
 import ErrorHandler from '../utils/utility-class.js';
-// Import ErrorHandler class
-// Create a new user
 export const createUser = async (data) => {
     try {
+        const existingUser = await User.findOne({ email: data.email });
+        if (existingUser) {
+            return new ErrorHandler('User already exists. Please login.', 401);
+        }
         const password = data.password;
         const hashedPassword = encryptWithBcrypt(password);
         const newUser = new User({
@@ -15,29 +18,29 @@ export const createUser = async (data) => {
         return await newUser.save();
     }
     catch (err) {
-        throw new ErrorHandler(`User creation failed: ${err.message}`, 500);
+        return new ErrorHandler(`User creation failed: ${err.message}`, 500);
     }
 };
-// Authenticate a user
 export const authenticateUser = async (email, password) => {
     try {
         const user = await User.findOne({ email });
         if (!user)
-            throw new ErrorHandler('User not found', 404);
+            return new ErrorHandler('User not found', 404);
         const isMatch = verifyWithBcrypt(password, user.password);
         if (!isMatch)
-            throw new ErrorHandler('Invalid password', 401);
-        return user;
+            return new ErrorHandler('Invalid password', 401);
+        const token = await generateJWTToken(user.id.toString() + new Date().getTime(), user.id);
+        return { user, token };
     }
     catch (err) {
-        throw new ErrorHandler(`Authentication failed: ${err.message}`, 500);
+        return new ErrorHandler(`Authentication failed: ${err.message}`, 500);
     }
 };
 export const getUserById = async (id) => {
     try {
         const user = await User.findById(id);
         if (!user)
-            throw new ErrorHandler('User not found', 404);
+            return new ErrorHandler('User not found', 404);
         return user;
     }
     catch (err) {
@@ -48,16 +51,16 @@ export const updateUser = async (id, updateData) => {
     try {
         const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
         if (!updatedUser)
-            throw new ErrorHandler('User not found', 404);
+            return new ErrorHandler('User not found', 404);
         return updatedUser;
     }
     catch (err) {
-        throw new ErrorHandler(`Failed to update user: ${err.message}`, 500);
+        return new ErrorHandler(`Failed to update user: ${err.message}`, 500);
     }
 };
 export const getAllUsers = async () => {
     try {
-        return await User.find();
+        return await User.find().select({ password: 0 });
     }
     catch (err) {
         throw new ErrorHandler(`Failed to get users: ${err.message}`, 500);

@@ -23,3 +23,10 @@ export const TryCatch =
   (req: Request, res: Response, next: NextFunction) => {
     return Promise.resolve(func(req, res, next)).catch(next);
   };
+
+declare module 'express' {
+  interface Request {
+    user?: any;
+    decodedToken?: any; 
+  }
+}
