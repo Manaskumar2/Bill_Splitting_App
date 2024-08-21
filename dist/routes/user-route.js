@@ -1,6 +1,6 @@
 import { Router } from 'express';
 const router = Router();
-import { createUserHandler, loginHandler, getUserByIdHandler, updateUserHandler, getAllUsersHandler } from '../Controllers/user-ctrl.js';
+import { createUserHandler, loginHandler, getUserByIdHandler, updateUserHandler, getAllUsersHandler } from '../controllers/user-cntrl.js';
 import { authenticateJWT } from '../middlewares/auth.js';
 router.post('/login', loginHandler);
 router.post('/register', createUserHandler);

@@ -6,13 +6,14 @@ import { validateGroupName, validateGroupDescription, isValidObjectId } from '..
 
 export const createGroupHandler = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
     const { name, description } = req.body;
+    let createdBy =req.decodedToken.id
 
     if (!validateGroupName(name)) return next(new ErrorHandler('Invalid group name', 400));
     if (description && !validateGroupDescription(description)) return next(new ErrorHandler('Invalid group description', 400));
 
-    const newGroup = await createGroup(req.body);
+    const newGroup = await createGroup({name,description,createdBy});
 
-     if (user instanceof ErrorHandler)return next(user);
+     if (newGroup instanceof ErrorHandler)return next(newGroup);
 
     res.status(201).json({
         success: true,
@@ -23,13 +24,14 @@ export const createGroupHandler = TryCatch(async (req: Request, res: Response, n
 export const addMemberHandler = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.body;
     const { groupId } = req.params;
+    const requestUserId = req.decodedToken.id
 
     if (!isValidObjectId(userId)) return next(new ErrorHandler('Invalid user ID', 400));
     if (!isValidObjectId(groupId)) return next(new ErrorHandler('Invalid group ID', 400));
 
-    const updatedGroup = await addMemberToGroup(groupId, userId);
+    const updatedGroup = await addMemberToGroup(groupId, userId,requestUserId);
 
-     if (user instanceof ErrorHandler)return next(user);
+     if (updatedGroup instanceof ErrorHandler)return next(updatedGroup);
 
     res.status(200).json({
         success: true,
@@ -40,13 +42,14 @@ export const addMemberHandler = TryCatch(async (req: Request, res: Response, nex
 export const removeMemberHandler = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.body;
     const { groupId } = req.params;
+    const requestUserId = req.decodedToken.id;
 
     if (!isValidObjectId(userId)) return next(new ErrorHandler('Invalid user ID', 400));
     if (!isValidObjectId(groupId)) return next(new ErrorHandler('Invalid group ID', 400));
 
-    const updatedGroup = await removeMemberFromGroup(groupId, userId);
+    const updatedGroup = await removeMemberFromGroup(groupId, userId,requestUserId);
 
-     if (user instanceof ErrorHandler)return next(user);
+     if (updatedGroup instanceof ErrorHandler)return next(updatedGroup);
 
     res.status(200).json({
         success: true,
@@ -61,7 +64,7 @@ export const getGroupHandler = TryCatch(async (req: Request, res: Response, next
 
     const group = await getGroupById(id);
 
-     if (user instanceof ErrorHandler)return next(user);
+     if (group instanceof ErrorHandler)return next(group);
      
     res.status(200).json({
         success: true,

@@ -6,7 +6,7 @@ import {
     getUserByIdHandler, 
     updateUserHandler, 
     getAllUsersHandler 
-} from '../Controllers/user-ctrl.js';
+} from '../controllers/user-cntrl.js';
 import { authenticateJWT } from '../middlewares/auth.js';
 
 
