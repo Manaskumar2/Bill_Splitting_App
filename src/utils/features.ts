@@ -8,3 +8,4 @@ export const connectDB = (uri: string) => {
     .then((c) => console.log(`DB Connected to ${c.connection.host}`))
     .catch((e) => console.log(e));
 };
+

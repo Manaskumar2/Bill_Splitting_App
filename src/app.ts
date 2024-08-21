@@ -5,6 +5,7 @@ import { errorMiddleware } from "./middlewares/error.js";
 
 import  userRoutes from "./routes/user-route.js"
 import groupRoutes from "./routes/group-route.js"
+import billRoutes from "./routes/bill-routes.js"
 
 
 
@@ -20,6 +21,7 @@ app.use(express.json());
 
 app.use("/api/v1/user",userRoutes);
 app.use("/api/v1/group",groupRoutes);
+app.use("/api/v1/bill",billRoutes);
 
 
 
