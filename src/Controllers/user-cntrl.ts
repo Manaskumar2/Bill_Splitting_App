@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { createUser, authenticateUser, getUserById, updateUser, getAllUsers } from '../services/userService.js';
+import { createUser, authenticateUser, getUserById, updateUser, getAllUsers } from '../services/user-service.js';
 import { validateName, validateEmail, validatePassword } from '../utils/validators.js';
 import ErrorHandler from '../utils/utility-class.js';
 import { TryCatch } from '../middlewares/error.js';
-import { IUser } from '../Models/user.js';
+import { IUser } from '../models/user.js';
 
 export const createUserHandler = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
     const { name, email, password } = req.body;

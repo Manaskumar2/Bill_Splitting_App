@@ -1,4 +1,4 @@
-import { IUser, User } from '../Models/user.js';
+import { IUser, User } from '../models/user.js';
 import { encryptWithBcrypt, verifyWithBcrypt } from '../utils/encryption-util.js';
 import { generateJWTToken } from '../utils/jwt-util.js';
 import ErrorHandler from '../utils/utility-class.js';
@@ -68,6 +68,6 @@ export const getAllUsers = async () => {
     try {
         return await User.find().select({password:0});
     } catch (err:any) {
-        throw new ErrorHandler(`Failed to get users: ${err.message}`, 500);
+        return new ErrorHandler(`Failed to get users: ${err.message}`, 500);
     }
 };
