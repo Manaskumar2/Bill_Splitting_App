@@ -13,7 +13,7 @@ export const createGroup = async (data) => {
         return new ErrorHandler(`Group creation failed: ${err.message}`, 500);
     }
 };
-export const addMemberToGroup = async (groupId, userId, requestUserId) => {
+export const addMembersToGroup = async (groupId, userIds, requestUserId) => {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
@@ -22,7 +22,8 @@ export const addMemberToGroup = async (groupId, userId, requestUserId) => {
         if (group.createdBy.toString() !== requestUserId) {
             return new ErrorHandler('Only the group creator can add members', 403);
         }
-        const updatedGroup = await Group.findByIdAndUpdate(groupId, { $addToSet: { members: new mongoose.Types.ObjectId(userId) } }, { new: true }).populate('members');
+        const objectIds = userIds.map(id => new mongoose.Types.ObjectId(id));
+        const updatedGroup = await Group.findByIdAndUpdate(groupId, { $addToSet: { members: { $each: objectIds } } }, { new: true }).populate('members');
         if (!updatedGroup) {
             return new ErrorHandler('Failed to add member to group', 400);
         }
@@ -32,7 +33,7 @@ export const addMemberToGroup = async (groupId, userId, requestUserId) => {
         return new ErrorHandler(`Failed to add member: ${err.message}`, 500);
     }
 };
-export const removeMemberFromGroup = async (groupId, userId, requestUserId) => {
+export const removeMembersFromGroup = async (groupId, userIds, requestUserId) => {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
@@ -41,7 +42,8 @@ export const removeMemberFromGroup = async (groupId, userId, requestUserId) => {
         if (group.createdBy.toString() !== requestUserId) {
             return new ErrorHandler('Only the group creator can add members', 403);
         }
-        const updatedGroup = await Group.findByIdAndUpdate(groupId, { $pull: { members: userId } }, { new: true }).populate('members');
+        const objectIds = userIds.map(id => new mongoose.Types.ObjectId(id));
+        const updatedGroup = await Group.findByIdAndUpdate(groupId, { $pull: { members: { $in: objectIds } } }, { new: true }).populate('members');
         if (!updatedGroup) {
             return new ErrorHandler('Group not found', 404);
         }
@@ -61,5 +63,29 @@ export const getGroupById = async (id) => {
     }
     catch (err) {
         return new ErrorHandler(`Failed to get group: ${err.message}`, 500);
+    }
+};
+export const deleteGroup = async (groupId, userId) => {
+    try {
+        const group = await Group.findById(groupId);
+        if (!group) {
+            return new ErrorHandler('Group not found', 404);
+        }
+        if (group.createdBy.toString() !== userId) {
+            return new ErrorHandler('You are not authorized to delete this group', 403);
+        }
+        await Group.findByIdAndDelete(groupId);
+        return { message: 'Group deleted successfully' };
+    }
+    catch (err) {
+        return new ErrorHandler(`Group deletion failed: ${err.message}`, 500);
+    }
+};
+export const getGroupsByCreatedBy = async (userId) => {
+    try {
+        return await Group.find({ createdBy: userId }).populate('members');
+    }
+    catch (err) {
+        return new ErrorHandler(`Failed to get groups: ${err.message}`, 500);
     }
 };

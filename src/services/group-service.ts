@@ -15,7 +15,7 @@ export const createGroup = async (data:any) => {
     }
 };
 
-export const addMemberToGroup = async (groupId: string, userId: string, requestUserId: string) => {
+export const addMembersToGroup = async (groupId: string, userIds: string[], requestUserId: string) => {
     try {
 
         const group = await Group.findById(groupId);
@@ -27,9 +27,11 @@ export const addMemberToGroup = async (groupId: string, userId: string, requestU
             return new ErrorHandler('Only the group creator can add members', 403);
         }
 
+        const objectIds = userIds.map(id => new mongoose.Types.ObjectId(id));
+
         const updatedGroup = await Group.findByIdAndUpdate(
             groupId,
-            { $addToSet: { members: new mongoose.Types.ObjectId(userId) } },
+            { $addToSet: { members:{ $each: objectIds }  } },
             { new: true }
         ).populate('members');
 
@@ -42,7 +44,7 @@ export const addMemberToGroup = async (groupId: string, userId: string, requestU
         return new ErrorHandler(`Failed to add member: ${err.message}`, 500);
     }
 };
-export const removeMemberFromGroup = async (groupId: string, userId: string,requestUserId:string) => {
+export const removeMembersFromGroup = async (groupId: string, userIds: string[],requestUserId:string) => {
     try {
            const group = await Group.findById(groupId);
 
@@ -53,10 +55,12 @@ export const removeMemberFromGroup = async (groupId: string, userId: string,requ
             return new ErrorHandler('Only the group creator can add members', 403);
         }
 
+        const objectIds = userIds.map(id => new mongoose.Types.ObjectId(id));
+
 
         const updatedGroup = await Group.findByIdAndUpdate(
             groupId,
-            { $pull: { members: userId } },
+            { $pull: { members: { $in: objectIds }  } },
             { new: true }
         ).populate('members');
 
@@ -81,5 +85,30 @@ export const getGroupById = async (id: string) => {
         return group;
     } catch (err: any) {
         return new ErrorHandler(`Failed to get group: ${err.message}`, 500);
+    }
+};
+export const deleteGroup = async (groupId: string, userId: string) => {
+    try {
+        const group = await Group.findById(groupId);
+        if (!group) {
+            return new ErrorHandler('Group not found', 404);
+        }
+        
+        if (group.createdBy.toString() !== userId) {
+            return new ErrorHandler('You are not authorized to delete this group', 403);
+        }
+
+         await Group.findByIdAndDelete(groupId);
+        return { message: 'Group deleted successfully' };
+    } catch (err: any) {
+        return new ErrorHandler(`Group deletion failed: ${err.message}`, 500);
+    }
+};
+export const getGroupsByCreatedBy = async (userId: string) => {
+    try {
+
+        return await Group.find({ createdBy: userId }).populate('members');
+    } catch (err: any) {
+        return new ErrorHandler(`Failed to get groups: ${err.message}`, 500);
     }
 };
