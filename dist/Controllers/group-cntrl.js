@@ -1,7 +1,7 @@
-import { createGroup, addMembersToGroup, removeMembersFromGroup, getGroupById, deleteGroup, getGroupsByCreatedBy } from '../services/group-service.js';
-import ErrorHandler from '../utils/utility-class.js';
 import { TryCatch } from '../middlewares/error.js';
+import ErrorHandler from '../utils/utility-class.js';
 import { validateGroupName, validateGroupDescription, isValidObjectId } from '../utils/validators.js';
+import { createGroup, addMembersToGroup, removeMembersFromGroup, getGroupById, deleteGroup, getGroupsByCreatedBy } from '../services/group-service.js';
 export const createGroupHandler = TryCatch(async (req, res, next) => {
     const { name, description } = req.body;
     let createdBy = req.decodedToken.id;

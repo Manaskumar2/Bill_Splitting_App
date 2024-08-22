@@ -1,6 +1,7 @@
-import { createBill, updateBill } from '../services/bill-service.js';
+import { createBill, getBillById, updateBill } from '../services/bill-service.js';
 import { validateCreateBillData } from '../utils/bill-validator.js';
 import ErrorHandler from '../utils/utility-class.js';
+import { TryCatch } from '../middlewares/error.js';
 export const createBillHandler = async (req, res, next) => {
     try {
         const validationErrors = validateCreateBillData(req.body);
@@ -23,17 +24,22 @@ export const createBillHandler = async (req, res, next) => {
         return new ErrorHandler(`Bill creation failed: ${err.message}`, 500);
     }
 };
-export const updateBillController = async (req, res, next) => {
-    try {
-        const billId = req.params.billId;
-        const data = req.body;
-        const updatedBill = await updateBill(billId, data);
-        res.status(200).json({
-            success: true,
-            bill: updatedBill
-        });
-    }
-    catch (err) {
-        next(new ErrorHandler(err.message, err.status || 500));
-    }
-};
+export const updateBillController = TryCatch(async (req, res, next) => {
+    const billId = req.params.billId;
+    const data = req.body;
+    const updatedBill = await updateBill(billId, data);
+    res.status(200).json({
+        success: true,
+        bill: updatedBill
+    });
+});
+export const getBillHandler = TryCatch(async (req, res, next) => {
+    const { id } = req.params;
+    const bill = await getBillById(id);
+    if (bill instanceof ErrorHandler)
+        return next(bill);
+    res.status(200).json({
+        success: true,
+        bill
+    });
+});

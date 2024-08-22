@@ -1,8 +1,9 @@
 // controllers/bill-controller.ts
 import { Request, Response, NextFunction } from 'express';
-import { createBill, updateBill } from '../services/bill-service.js';
+import { createBill, getBillById, updateBill } from '../services/bill-service.js';
 import { validateCreateBillData } from '../utils/bill-validator.js';
 import ErrorHandler from '../utils/utility-class.js';
+import { TryCatch } from '../middlewares/error.js';
 
 export const createBillHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -28,8 +29,7 @@ export const createBillHandler = async (req: Request, res: Response, next: NextF
     }
 };
 
-export const updateBillController = async (req: Request, res: Response, next: NextFunction) => {
-    try {
+export const updateBillController = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
         const billId = req.params.billId;
         const data = req.body;
 
@@ -39,7 +39,18 @@ export const updateBillController = async (req: Request, res: Response, next: Ne
             success: true,
             bill: updatedBill
         });
-    } catch (err: any) {
-        next(new ErrorHandler(err.message, err.status || 500));
-    }
-};
+   
+});
+
+export const getBillHandler = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    const bill = await getBillById(id);
+
+     if (bill instanceof ErrorHandler)return next(bill);
+     
+    res.status(200).json({
+        success: true,
+        bill
+    });
+});

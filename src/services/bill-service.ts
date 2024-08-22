@@ -55,3 +55,16 @@ export const updateBill = async (billId:string, data: IUpdateBillData) => {
         throw new ErrorHandler(`Bill update failed: ${err.message}`, 500);
     }
 };
+export const getBillById = async (id: string) => {
+    try {
+        const bill = await Bill.findById(id);
+
+        if (!bill) {
+           return new ErrorHandler('Bill not found', 404);
+        }
+
+        return bill;
+    } catch (err: any) {
+        return new ErrorHandler(`Failed to get Bill: ${err.message}`, 500);
+    }
+};
