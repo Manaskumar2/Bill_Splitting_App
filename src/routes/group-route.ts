@@ -1,6 +1,13 @@
 import express from 'express';
 import { authenticateJWT } from '../middlewares/auth.js';
-import { createGroupHandler, addMemberHandler, removeMemberHandler, getGroupHandler, getUserGroupsHandler, deleteGroupHandler } from '../controllers/group-cntrl.js';
+import {
+    createGroupHandler,
+    addMemberHandler,
+    removeMemberHandler,
+    getGroupHandler, 
+    getUserGroupsHandler, 
+    deleteGroupHandler 
+} from '../controllers/group-cntrl.js';
 
 const router = express.Router();
 router.get('/:id',authenticateJWT,getGroupHandler);

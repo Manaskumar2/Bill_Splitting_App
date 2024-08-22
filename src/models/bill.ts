@@ -10,6 +10,7 @@ interface IUserShare {
     paid: boolean;
     shareAmount: number;
     userId: mongoose.Types.ObjectId;
+    
 }
 
 interface IBill extends Document {
