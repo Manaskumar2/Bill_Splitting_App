@@ -7,7 +7,11 @@ A backend application for splitting bills among users. The application allows us
 
 1. Clone the repository.
 2. Install dependencies: `npm install`
-3. Configure your environment variables.
+3. Create a `.env` file in the root directory of your project and configure the following environment variables:
+PORT=3000
+DB_CONNECTION= "database url"
+JWT_SECRET=your_secret_key
+JWT_REFRESH_EXPIRY_TIME=1d
 4. Run the application: `npm start`
 
 
@@ -131,14 +135,4 @@ The API returns standard HTTP status codes and error messages. Ensure to handle 
 
 The application uses rate limiting to protect against abuse. The default rate limit is 100 requests per 10 minutes per IP address.
 
-## Setup and Running
-
-1. Clone the repository.
-2. Install dependencies: `npm install`
-3. Create a `.env` file in the root directory of your project and configure the following environment variables:
-PORT=3000
-DB_CONNECTION= "database url"
-JWT_SECRET=your_secret_key
-JWT_REFRESH_EXPIRY_TIME=1d
-4. Run the application: `npm start`
 
