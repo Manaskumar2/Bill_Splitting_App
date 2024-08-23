@@ -15,3 +15,8 @@ export const validateGroupName = (name: string): boolean => {
 export const validateGroupDescription = (description?: string): boolean => {
     return !description || typeof description === 'string';
 };
+export const validPaymentMethods = ["CASH", "BANK_TRANSFER", "UPI"] as const;
+
+export function validatePaymentMethod(method: string): boolean {
+    return validPaymentMethods.includes(method as typeof validPaymentMethods[number]);
+}

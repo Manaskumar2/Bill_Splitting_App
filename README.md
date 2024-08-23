@@ -115,7 +115,7 @@ A backend application for splitting bills among users. The application allows us
 
 - **Create Payment**
   - `POST /api/v1/payment/pay`
-  - Request Body: `{ "billId": "ObjectId", "userId": "ObjectId", "amount": "number", "method": "CASH | BANK_TRANSFER | UPI" }`
+  - Request Body: `{ "billId": "ObjectId", "userId": "ObjectId", "amount":    "number", "method": "CASH | BANK_TRANSFER | UPI" }`
   - Description: Records a payment for a bill.
 
 - **Get Payment History**
@@ -135,6 +135,10 @@ The application uses rate limiting to protect against abuse. The default rate li
 
 1. Clone the repository.
 2. Install dependencies: `npm install`
-3. Configure your environment variables.
+3. Create a `.env` file in the root directory of your project and configure the following environment variables:
+PORT=3000
+DB_CONNECTION= "database url"
+JWT_SECRET=your_secret_key
+JWT_REFRESH_EXPIRY_TIME=1d
 4. Run the application: `npm start`
 

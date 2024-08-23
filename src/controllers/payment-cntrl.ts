@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { TryCatch } from "../middlewares/error.js";
 import ErrorHandler from "../utils/utility-class.js";
-import { isValidObjectId } from "../utils/validators.js";
+import { isValidObjectId, validatePaymentMethod, validPaymentMethods } from "../utils/validators.js";
 import { Request, Response, NextFunction } from 'express';
 import { createPayment, getPaymentHistory } from "../services/payment-service.js";
 
@@ -10,9 +10,15 @@ export const createPaymentHandler = TryCatch(async (req: Request, res: Response,
     const { billId, amount, method,groupId } = req.body;
     const userId = req.decodedToken.id;
 
-    if (!isValidObjectId(billId))
+    if (!isValidObjectId(billId)) {
         return next(new ErrorHandler("Invalid bill ID", 400));
-
+    }
+    if (!validatePaymentMethod(method)) {
+    return next(new ErrorHandler(`Invalid payment method. Valid methods are: ${validPaymentMethods.join(", ")}.`, 400));
+    }
+    if (typeof amount !== "number" || amount <= 0) {
+        return next(new ErrorHandler("Invalid amount. Amount must be a positive number.", 400));
+    }
 
     const payment = await createPayment({
         billId,
