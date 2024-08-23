@@ -4,6 +4,7 @@ import { createBill, getBillById, updateBill } from '../services/bill-service.js
 import { validateCreateBillData } from '../utils/bill-validator.js';
 import ErrorHandler from '../utils/utility-class.js';
 import { TryCatch } from '../middlewares/error.js';
+import { notifyBillUpdate } from '../services/socketio.js';
 
 export const createBillHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -34,6 +35,10 @@ export const updateBillController = TryCatch(async (req: Request, res: Response,
         const data = req.body;
 
         const updatedBill = await updateBill(billId, data);
+
+        if(updatedBill){
+            notifyBillUpdate(updatedBill)
+        }
 
         res.status(200).json({
             success: true,
